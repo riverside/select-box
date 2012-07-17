@@ -1,10 +1,10 @@
 /*!
- * jQuery Selectbox plugin 0.1.3
+ * jQuery Selectbox plugin 0.2
  *
- * Copyright 2011, Dimitar Ivanov (http://www.bulgaria-web-developers.com/projects/javascript/selectbox/)
+ * Copyright 2011-2012, Dimitar Ivanov (http://www.bulgaria-web-developers.com/projects/javascript/selectbox/)
  * Licensed under the MIT (http://www.opensource.org/licenses/mit-license.php) license.
  * 
- * Date: Wed Jul 29 23:20:57 2011 +0200
+ * Date: Tue Jul 17 19:58:36 2012 +0300
  */
 (function ($, undefined) {
 	var PROP_NAME = 'selectbox',
@@ -28,6 +28,7 @@
 			classDisabled: "sbDisabled",
 			classToggleOpen: "sbToggleOpen",
 			classToggle: "sbToggle",
+			classFocus: "sbFocus",
 			speed: 200,
 			effect: "slide", // "slide" or "fade"
 			onChange: null, //Define a callback function when the selectbox is changed
@@ -86,12 +87,14 @@
 			$target.hide();
 			
 			function closeOthers() {
-				var key, uid = this.attr("id").split("_")[1];
+				var key, sel,
+					uid = this.attr("id").split("_")[1];
 				for (key in self._state) {
 					if (key !== uid) {
 						if (self._state.hasOwnProperty(key)) {
-							if ($(":input[sb='" + key + "']")[0]) {
-								self._closeSelectbox($(":input[sb='" + key + "']")[0]);
+							sel = $("select[sb='" + key + "']")[0];
+							if (sel) {
+								self._closeSelectbox(sel);
 							}
 						}
 					}
@@ -100,7 +103,8 @@
 			
 			sbHolder = $("<div>", {
 				"id": "sbHolder_" + inst.uid,
-				"class": inst.settings.classHolder
+				"class": inst.settings.classHolder,
+				"tabindex": $target.attr("tabindex")
 			});
 			
 			sbSelector = $("<a>", {
@@ -179,18 +183,28 @@
 					if (!that.is(":disabled") && !disabled) {
 						child = $("<a>", {
 							"href": "#" + that.val(),
-							"rel": that.val(), 
-							"text": that.text(),
-							"click": function (e) {
+							"rel": that.val()
+						}).text(that.text()).bind("click.sb", function (e) {
+							if (e && e.preventDefault) {
 								e.preventDefault();
-								var t = sbToggle,
-									uid = t.attr("id").split("_")[1];
-								self._changeSelectbox(target, $(this).attr("rel"), $(this).text());
-								self._closeSelectbox(target);
 							}
+							var t = sbToggle,
+							 	$this = $(this),
+								uid = t.attr("id").split("_")[1];
+							self._changeSelectbox(target, $this.attr("rel"), $this.text());
+							self._closeSelectbox(target);
+						}).bind("mouseover.sb", function () {
+							var $this = $(this);
+							$this.parent().siblings().find("a").removeClass(inst.settings.classFocus);
+							$this.addClass(inst.settings.classFocus);
+						}).bind("mouseout.sb", function () {
+							$(this).removeClass(inst.settings.classFocus);
 						});
 						if (sub) {
 							child.addClass(inst.settings.classSub);
+						}
+						if (that.is(":selected")) {
+							child.addClass(inst.settings.classFocus);
 						}
 						child.appendTo(li);
 					} else {
@@ -209,12 +223,90 @@
 			if (!s) {
 				sbSelector.text(opts.first().text());
 			}
-			
+
 			$.data(target, PROP_NAME, inst);
+			
+			sbHolder.data("uid", inst.uid).bind("keydown.sb", function (e) {
+				var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0,
+					$this = $(this),
+					uid = $this.data("uid"),
+					inst = $this.siblings("select[sb='"+uid+"']").data(PROP_NAME),
+					trgt = $this.siblings(["select[sb='", uid, "']"].join("")).get(0),
+					$f = $this.find("ul").find("a." + inst.settings.classFocus);
+				switch (key) {
+					case 37: //Arrow Left
+					case 38: //Arrow Up
+						if ($f.length > 0) {
+							var $next;
+							$("a", $this).removeClass(inst.settings.classFocus);
+							$next = $f.parent().prevAll("li:has(a)").eq(0).find("a");
+							if ($next.length > 0) {
+								$next.addClass(inst.settings.classFocus).focus();
+								$("#sbSelector_" + uid).text($next.text());
+							}
+						}
+						break;
+					case 39: //Arrow Right
+					case 40: //Arrow Down
+						var $next;
+						$("a", $this).removeClass(inst.settings.classFocus);
+						if ($f.length > 0) {
+							$next = $f.parent().nextAll("li:has(a)").eq(0).find("a");
+						} else {
+							$next = $this.find("ul").find("a").eq(0);
+						}
+						if ($next.length > 0) {
+							$next.addClass(inst.settings.classFocus).focus();
+							$("#sbSelector_" + uid).text($next.text());
+						}
+						break;				
+					case 13: //Enter
+						if ($f.length > 0) {
+							self._changeSelectbox(trgt, $f.attr("rel"), $f.text());
+						}
+						self._closeSelectbox(trgt);
+						break;
+					case 9: //Tab
+						if (trgt) {
+							var inst = self._getInst(trgt);
+							if (inst/* && inst.isOpen*/) {
+								if ($f.length > 0) {
+									self._changeSelectbox(trgt, $f.attr("rel"), $f.text());
+								}
+								self._closeSelectbox(trgt);
+							}
+						}
+						var i = parseInt($this.attr("tabindex"), 10);
+						if (!e.shiftKey) {
+							i++;
+						} else {
+							i--;
+						}
+						$("*[tabindex='" + i + "']").focus();
+						break;
+					case 27: //Escape
+						self._closeSelectbox(trgt);
+						break;
+				}
+				e.stopPropagation();
+				return false;
+			}).delegate("a", "mouseover", function (e) {
+				$(this).addClass(inst.settings.classFocus);
+			}).delegate("a", "mouseout", function (e) {
+				$(this).removeClass(inst.settings.classFocus);	
+			});
 			
 			sbSelector.appendTo(sbHolder);
 			sbOptions.appendTo(sbHolder);			
 			sbHolder.insertAfter($target);
+			
+			$("html").live('mousedown', function(e) {
+				e.stopPropagation();          
+				$("select").selectbox('close'); 
+			});
+			$([".", inst.settings.classHolder, ", .", inst.settings.classSelector].join("")).mousedown(function(e) {    
+				e.stopPropagation();
+			});
 		},
 		/**
 		 * Remove the selectbox functionality completely. This will return the element back to its pre-init state.
@@ -238,13 +330,17 @@
 		 * @param {String} text
 		 */
 		_changeSelectbox: function (target, value, text) {
-			var inst = this._getInst(target),
+			var onChange,
+				inst = this._getInst(target);
+			if (inst) {
 				onChange = this._get(inst, 'onChange');
-			$("#sbSelector_" + inst.uid).text(text);
+				$("#sbSelector_" + inst.uid).text(text);
+			}
+			value = value.replace(/\'/g, "\\'");
 			$(target).find("option[value='" + value + "']").attr("selected", TRUE);
-			if (onChange) {
+			if (inst && onChange) {
 				onChange.apply((inst.input ? inst.input[0] : null), [value, inst]);
-			} else if (inst.input) {
+			} else if (inst && inst.input) {
 				inst.input.trigger('change');
 			}
 		},
@@ -413,5 +509,5 @@
 	};
 	
 	$.selectbox = new Selectbox(); // singleton instance
-	$.selectbox.version = "0.1.3";
+	$.selectbox.version = "0.2";
 })(jQuery);
