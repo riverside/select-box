@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+	<head>
+		<title>jQuery SelectBox plugin</title>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+		<link href="../jquery.selectbox.css" type="text/css" rel="stylesheet" />
+	</head>
+	<body>
+
+		<select name="country_id" id="country_id">
+			<option value="">-- Select country --</option>
+			<optgroup label="North America">
+				<option value="1">USA</option>
+				<option value="9">Canada</option>
+			</optgroup>
+			<optgroup label="Europe">
+				<option value="2">France</option>
+				<option value="3">Spain</option>
+				<option value="6">Bulgaria</option>
+				<option value="7" disabled="disabled">Greece</option>
+				<option value="8">Italy</option>
+			</optgroup>
+			<optgroup label="Asia" disabled="disabled">
+				<option value="5">Japan</option>
+				<option value="11">China</option>
+			</optgroup>
+			<option value="4">Brazil</option>
+			<option value="10">South Africa</option>
+		</select>
+
+		<script type="text/javascript" src="../jquery-1.6.3.min.js"></script>
+		<script type="text/javascript" src="../jquery.selectbox-0.1.3.js"></script>
+		<script type="text/javascript">
+		$(function () {
+			$("#country_id").selectbox();
+		});
+		</script>
+	</body>
+</html>
