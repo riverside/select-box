@@ -7,7 +7,9 @@
 	</head>
 	<body>
 
-		<select name="country_id" id="country_id">
+		<p>View API and more demos at: <a href="http://www.bulgaria-web-developers.com/projects/javascript/selectbox/">jQuery SelectBox plugin v0.2</a></p>
+
+		<select name="country_id" id="country_id" tabindex="1">
 			<option value="">-- Select country --</option>
 			<optgroup label="North America">
 				<option value="1">USA</option>
@@ -27,12 +29,27 @@
 			<option value="4">Brazil</option>
 			<option value="10">South Africa</option>
 		</select>
+		<br />
+		<select name="language" id="language" tabindex="2">
+			<option value="">-- Select language --</option>
+			<option value="1">PHP</option>
+			<option value="2">Javascript</option>
+			<option value="3">Objective C</option>
+		</select>
+		<br />
+		<select name="vehicle" id="vehicle" tabindex="3">
+			<option value="">-- Select vehicle --</option>
+			<option value="1">BMW</option>
+			<option value="2">Mercedes</option>
+			<option value="3">Volvo</option>
+		</select>
 
-		<script type="text/javascript" src="../jquery-1.6.3.min.js"></script>
-		<script type="text/javascript" src="../jquery.selectbox-0.1.3.js"></script>
+		<script type="text/javascript" src="../jquery-1.7.2.min.js"></script>
+		<script type="text/javascript" src="../jquery.selectbox-0.2.js"></script>
 		<script type="text/javascript">
 		$(function () {
 			$("#country_id").selectbox();
+			$("#language, #vehicle").selectbox();
 		});
 		</script>
 	</body>

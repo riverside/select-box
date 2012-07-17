@@ -9,6 +9,9 @@
 	position: relative;
 	width: 200px;
 }
+.sbHolder:focus .sbSelector{
+	
+}
 .sbSelector{
 	display: block;
 	height: 30px;
@@ -81,7 +84,9 @@
 	color: #ddd;
 	text-decoration: none;
 }
-.sbOptions a:hover{
+.sbOptions a:hover,
+.sbOptions a:focus,
+.sbOptions a.sbFocus{
 	color: #EBB52D;
 }
 .sbOptions li.last a{
