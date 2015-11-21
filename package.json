@@ -1,0 +1,21 @@
+{
+  "name": "select-box",
+  "version: "0.3",
+  "description": "Makes your titles or url's SEO friendly",
+  "keywords": ["jquery", "select", "selectbox", "dropdown"],
+  "homepage": "https://github.com/riverside/select-box",
+  "bugs": "https://github.com/riverside/select-box/issues",
+  "license": "MIT",
+  "author": {
+    "name": "Dimitar Ivanov",
+    "url": "http://zinoui.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/riverside/select-box.git"
+  },
+  "dependencies": {
+    "jquery": "*"
+  },
+  "main": "jquery.selectbox.js"
+}
