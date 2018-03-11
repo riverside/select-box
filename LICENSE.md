@@ -1,4 +1,4 @@
-Copyright (c) 2015 Dimitar Ivanov, http://www.bulgaria-web-developers.com/
+Copyright (c) 2015 Dimitar Ivanov, https://zinoui.com/
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
